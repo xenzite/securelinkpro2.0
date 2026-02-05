@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Monetag Verification Meta Tag -->
+    <meta id="monetag-meta" name="monetag" content="b424f270ce8161adbe465a8c058abd0c">
+    
+    <title>SecureLink Pro | Secure Links, Simplified </title>
+
+    <meta name="description" content="SecureLink Pro - The most secure and fastest way to shorten and manage your links. Protect your URLs, bypass ad-blockers, and enjoy a seamless sharing experience with Xenzite technology.">
+    
+    <meta name="keywords" content="SecureLink Pro, Xenzite, link shortener, secure url, adblock bypass, link bypasser, safe link, link management, short urls, protected links, secure link sharing">
+    
+    <link rel="icon" type="image/png" href="https://ibb.co.com/fzLGkHFv">
+    <link rel="apple-touch-icon" href="https://ibb.co.com/fzLGkHFv">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Monetag SDK -->
+    <script id="monetag-sdk" src='//libtl.com/sdk.js' data-zone='10421542' data-sdk='show_10421542'></script>
+    <div id="monetag-scripts-area">
+        <script>(function(s){s.dataset.zone='10421454',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+        <script>(function(s){s.dataset.zone='10421440',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    </div>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        
+        :root { 
+            --primary: #3b82f6; 
+            --accent: #10b981; 
+            --bg-dark: #020617; 
+            --card-bg: rgba(15, 23, 42, 0.8);
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        #adblock-wrapper {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(2, 6, 23, 0.98);
+            backdrop-filter: blur(12px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Improved Light Mode Colors */
+        body.light-mode {
+            --bg-dark: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --border: rgba(0, 0, 0, 0.05);
+            background-image: radial-gradient(circle at 50% -20%, #dbeafe, transparent),
+                              radial-gradient(circle at 0% 100%, #f1f5f9, transparent);
+        }
+
+        /* Light Mode Overrides */
+        body.light-mode #userKey, 
+        body.light-mode #captchaInput {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .captcha-box {
+            background-color: #e2e8f0 !important;
+            color: #2563eb !important;
+            border-color: #3b82f6 !important;
+        }
+        body.light-mode .version-badge {
+            background-color: #e2e8f0 !important;
+            color: #475569 !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode #keySection .bg-slate-900\/40 {
+            background-color: rgba(0, 0, 0, 0.04) !important;
+            border-color: #e2e8f0 !important;
+        }
+        body.light-mode #roadmap .bg-slate-700 {
+            background-color: #e2e8f0 !important;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% -20%, #1e293b, transparent),
+                              radial-gradient(circle at 0% 100%, #0f172a, transparent);
+            color: var(--text-main); 
+            font-family: 'Outfit', sans-serif; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .glass-card {
+            background: var(--card-bg); 
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            transition: background 0.4s ease, border 0.4s ease;
+        }
+
+        .step-box { display: none; }
+        .active-step { display: block; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        #topNotif {
+            position: fixed; top: 0; left: 0; width: 100%; min-height: 40px;
+            background: linear-gradient(90deg, #1e40af, #065f46);
+            color: white; font-size: 12px; font-weight: 600; padding: 8px 15px;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        #topNotif.show { transform: translateY(0); }
+
+        .btn-click-anim { transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-click-anim:active { transform: scale(0.92); }
+
+        #themeToggle {
+            cursor: pointer; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; background: rgba(128, 128, 128, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        @keyframes rotateIn { 
+            0% { transform: rotate(-180deg) scale(0); opacity: 0; } 
+            100% { transform: rotate(0deg) scale(1); opacity: 1; } 
+        }
+        .theme-icon-anim { animation: rotateIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .file-name-container {
+            background: linear-gradient(145deg, rgba(59, 130, 246, 0.15), rgba(30, 41, 59, 0.5));
+            border: 1px solid rgba(59, 130, 246, 0.4); overflow: hidden; position: relative;
+        }
+        .indicator-dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; transition: 0.3s; }
+        .indicator-dot.active { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        
+        /* Captcha Styling */
+        .captcha-box {
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px dashed #3b82f6;
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 8px;
+            user-select: none;
+            text-decoration: line-through;
+            font-style: italic;
+        }
+
+        /* Pulse Animation for YouTube Button */
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(255, 0, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+        }
+        .animate-pulse-red {
+            animation: pulse-red 2s infinite;
+        }
+    </style>
+</head>
+<body class="items-center p-4">
+
+<!-- Anti-Adblock Overlay -->
+<div id="adblock-wrapper">
+    <div class="max-w-sm w-full glass-card p-10 rounded-[2.5rem] text-center border-blue-500/20 shadow-2xl">
+        <div class="w-20 h-20 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h2 class="text-2xl font-extrabold mb-4 tracking-tight">Ad Blocker Detected</h2>
+        <p class="text-slate-400 text-sm mb-8 leading-relaxed">
+            We've noticed an ad blocker is active. To keep our portal free and secure, please disable it and click the button below to continue.
+        </p>
+        <button onclick="window.location.reload()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-bold btn-click-anim text-white shadow-lg shadow-blue-500/30 transition-all">
+            I've Disabled It
+        </button>
+    </div>
+</div>
+    
+    <div id="topNotif">Processing...</div>
+
+    <!-- Header -->
+    <div class="w-full max-w-md flex justify-between items-center py-6 mb-2">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <i class="fas fa-link text-white text-sm"></i>
+            </div>
+            <span class="font-bold text-lg tracking-tight">SecureLink<span class="text-blue-500">PRO</span></span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button id="themeToggle" onclick="toggleTheme()" class="btn-click-anim">
+                <i id="themeIcon" class="fas fa-moon text-yellow-400"></i>
+            </button>
+            <div class="version-badge text-xs bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 text-slate-400 transition-colors">v2.7.2 <span class="text-green-500 ml-1">●</span></div>
+        </div>
+    </div>
+
+    <!-- Adsterra Top (Dynamic) -->
+    <div id="ad-top-area" class="ad-banner-area w-full max-w-md mb-6" style="min-height: 50px; text-align: center;">
+        <script>atOptions = { 'key' : '94c6cbd8f44d43e6b70a0614895dae0b', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };</script>
+        <script src="https://www.highperformanceformat.com/94c6cbd8f44d43e6b70a0614895dae0b/invoke.js"></script>
+    </div>
+
+    <!-- Main Card -->
+    <div class="w-full max-w-md glass-card rounded-[2.5rem] p-8 relative">
+        
+        <div id="fileInfoArea" class="hidden text-center mb-8 px-4 py-5 file-name-container rounded-3xl">
+            <span class="text-[9px] uppercase tracking-[0.4em] text-blue-500 font-black mb-2 block">Link Authorized</span>
+            <h1 id="innerFileName" class="text-xl font-black truncate px-2 relative z-10">Loading...</h1>
+            <div class="mt-2 h-1 w-16 bg-blue-500/30 mx-auto rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 animate-[loading_2s_infinite]"></div>
+            </div>
+        </div>
+
+        <!-- Roadmap (Updated to 4 Steps) -->
+        <div id="roadmap" class="hidden flex justify-between items-center mb-10 px-4">
+            <div class="flex flex-col items-center gap-2"><div id="dot1" class="indicator-dot active"></div><span class="text-[10px] uppercase text-blue-500 font-bold">Step 1</span></div>
+            <div class="h-[1px] flex-1 bg-slate-700 mx-2"></div>
+            <div class="flex flex-col items-center gap-2"><div id="dot2" class="indicator-dot"></div><span class="text-[10px] uppercase text-slate-500 font-bold">Step 2</span></div>
+            <div class="h-[1px] flex-1 bg-slate-700 mx-2"></div>
+            <div class="flex flex-col items-center gap-2"><div id="dot3" class="indicator-dot"></div><span class="text-[10px] uppercase text-slate-500 font-bold">Step 3</span></div>
+            <div class="h-[1px] flex-1 bg-slate-700 mx-2"></div>
+            <div class="flex flex-col items-center gap-2"><div id="dot4" class="indicator-dot"></div><span class="text-[10px] uppercase text-slate-500 font-bold">Step 4</span></div>
+        </div>
+
+        <!-- Login Section -->
+        <div id="keySection" class="active-step">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-extrabold mb-2">Access Portal</h2>
+                <p class="text-slate-400 text-sm">Enter your 6-digit key and complete verification.</p>
+            </div>
+            
+            <div class="relative group mb-6">
+                <input type="number" id="userKey" placeholder="000000" class="w-full bg-slate-900/50 border-2 border-slate-800 rounded-2xl py-5 text-center text-4xl font-black tracking-[0.3em] outline-none focus:border-blue-500 transition-all text-white">
+            </div>
+
+            <!-- Advanced Human Verification (Captcha) -->
+            <div class="mb-6 p-4 bg-slate-900/40 rounded-2xl border border-slate-800">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Human Verification</span>
+                    <button onclick="generateCaptcha()" class="text-blue-500 text-xs hover:underline flex items-center gap-1"><i class="fas fa-sync-alt"></i> Refresh Code</button>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-4 leading-relaxed">To protect your link from automated bots, please enter the security code shown below to verify you are human.</p>
+                <div id="captchaDisplay" class="captcha-box w-full py-3 text-center text-2xl font-bold text-blue-400 mb-4 rounded-xl"></div>
+                <input type="text" id="captchaInput" placeholder="Type the code above" class="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 px-4 text-center font-bold tracking-widest outline-none focus:border-emerald-500 transition-all text-white">
+            </div>
+            <button onclick="verifyKey()" class="w-full bg-blue-600 py-5 rounded-2xl font-bold text-lg btn-click-anim text-white shadow-lg shadow-blue-500/20"> 
+                UNLOCK ACCESS 
+            </button>
+
+            <!-- YouTube Tutorial Button -->
+            <div id="tutorialArea" class="hidden mt-4">
+                <a id="tutorialLink" href="#" target="_blank" class="w-full bg-[#FF0000] py-4 rounded-2xl font-bold text-sm text-white flex items-center justify-center gap-2 btn-click-anim animate-pulse-red">
+                    <i class="fab fa-youtube text-lg"></i>
+                    <span id="tutorialBtnText">Watch Tutorial</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Steps -->
+        <div id="step1" class="step-box text-center">
+            <h2 class="text-xl font-bold mb-6">Initial Verification</h2>
+            <button onclick="callMonetagAd(1)" id="adBtn1" class="w-full bg-orange-600 py-6 rounded-2xl font-bold mb-4 shadow-lg btn-click-anim text-white">Watch  Ads (<span id="count1">0/2</span>)</button>
+        </div>
+
+        <div id="step2" class="step-box text-center">
+            <h2 class="text-xl font-bold mb-6">Security Validation</h2>
+            <button onclick="callMonetagAd(2)" id="adBtn2" class="w-full bg-indigo-600 py-6 rounded-2xl font-bold mb-4 shadow-lg btn-click-anim text-white">Watch  Ads(<span id="count2">0/2</span>)</button>
+        </div>
+
+        <div id="step3" class="step-box text-center">
+            <h2 class="text-xl font-bold mb-6">Access Confirmation</h2>
+            <button onclick="callMonetagAd(3)" id="adBtn3" class="w-full bg-pink-600 py-5 rounded-2xl font-bold mb-4 btn-click-anim text-white">Watch  Ads(<span id="count3">0/2</span>)</button>
+        </div>
+
+        <div id="step4" class="step-box text-center">
+            <h2 class="text-xl font-bold mb-6">Final Authorization</h2>
+            <button onclick="callMonetagAd(4)" id="adBtn4" class="w-full bg-emerald-600 py-5 rounded-2xl font-bold mb-4 btn-click-anim text-white">Get Link (<span id="count4">0/2</span>)</button>
+            
+            <div id="finalActions" class="hidden space-y-4">
+                <button onclick="triggerDownload()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 py-6 rounded-2xl font-black text-xl shadow-2xl btn-click-anim text-white">OPEN LINK NOW</button>
+                
+                <!-- URL Status Display (New) -->
+                <div id="urlStatusBox" class="p-4 bg-slate-900/60 border border-slate-700 rounded-2xl text-center">
+                    <p class="text-[10px] uppercase text-slate-500 font-bold mb-1">Link Status</p>
+                    <p id="urlStatusText" class="text-sm font-semibold text-blue-400">Checking status...</p>
+                </div>
+
+                <button onclick="copyToClipboard()" class="w-full bg-slate-800 py-4 rounded-xl font-bold text-sm text-slate-400 border border-slate-700 btn-click-anim">
+                    <i class="fas fa-copy mr-2"></i> Copy Link
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adsterra Bottom (Dynamic) -->
+    <div id="ad-bottom-area" class="ad-banner-area w-full max-w-md mt-6" style="min-height: 50px; text-align: center;">
+        <script>atOptions = {'key' : '94c6cbd8f44d43e6b70a0614895dae0b','format' : 'iframe','height' : 50,'width' : 320,'params' : {}};</script>
+        <script src="https://www.highperformanceformat.com/94c6cbd8f44d43e6b70a0614895dae0b/invoke.js"></script>
+    </div>
+
+<footer class="mt-auto py-10 text-center border-top border-slate-800" style="border-top: 1px solid rgba(255,255,255,0.05);">
+    
+    <div class="flex justify-center gap-6 mb-6">
+        <a href="YOUR_FACEBOOK_URL" class="text-slate-400 hover:text-blue-600 transition-all duration-300 transform hover:scale-110 text-xl">
+            <i class="fab fa-facebook"></i>
+        </a>
+        <a href="YOUR_INSTAGRAM_URL" class="text-slate-400 hover:text-pink-500 transition-all duration-300 transform hover:scale-110 text-xl">
+            <i class="fab fa-instagram"></i>
+        </a>
+        <a href="YOUR_TELEGRAM_URL" class="text-slate-400 hover:text-sky-500 transition-all duration-300 transform hover:scale-110 text-xl">
+            <i class="fab fa-telegram"></i>
+        </a>
+        <a href="YOUR_YOUTUBE_URL" class="text-slate-400 hover:text-red-600 transition-all duration-300 transform hover:scale-110 text-xl">
+            <i class="fab fa-youtube"></i>
+        </a>
+    </div>
+
+    <div class="mb-4 text-xs uppercase tracking-widest text-slate-500">
+        <a href="#" class="hover:text-slate-300 mx-2">Privacy Policy</a> • 
+        <a href="#" class="hover:text-slate-300 mx-2">Terms of Service</a> • 
+        <a href="#" class="hover:text-slate-300 mx-2">Help Center</a> •
+        <a href="#" class="hover:text-slate-300 mx-2">About Us</a> •
+        <a href="#" class="hover:text-slate-300 mx-2">Contact Us</a>
+    </div>
+
+    <div class="space-y-2">
+        <p class="text-slate-500 text-sm">
+            Developed by 
+            <a href="https://t.me/xenzite_ceo" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 font-bold hover:opacity-80 underline decoration-cyan-500/30">
+                Xenzite
+            </a>
+        </p>
+
+        <p class="text-slate-600 text-[12px]">
+            &copy; 2025 -  <span id="currentYear"></span> 
+            <a href="#" class="font-semibold text-blue-500 hover:text-blue-400">SecureLink Pro</a>. 
+            All Rights Reserved.
+        </p>
+    </div>
+</footer>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_tFKchJD2HYOTU2UlOgUKy3Bn7WVAG4w",
+            authDomain: "ppd-by-xenzite.firebaseapp.com",
+            databaseURL: "https://ppd-by-xenzite-default-rtdb.firebaseio.com",
+            projectId: "ppd-by-xenzite",
+            storageBucket: "ppd-by-xenzite.firebasestorage.app",
+            messagingSenderId: "985409138886",
+            appId: "1:985409138886:web:c0c7c6349194dc4113a7c7",
+            measurementId: "G-S3JMT0M4D4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let targetFileLink = "";
+        let adsCountPerStep = 0;
+        let currentCaptcha = "";
+        let currentAdSettings = {};
+
+        function loadGlobalSettings() {
+            db.ref('settings').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+                if (data.tutorial) {
+                    document.getElementById('tutorialArea').classList.remove('hidden');
+                    document.getElementById('tutorialLink').href = data.tutorial.url;
+                    document.getElementById('tutorialBtnText').innerText = data.tutorial.title || "Watch Tutorial";
+                }
+                if (data.ads) {
+                    currentAdSettings = data.ads;
+                    if (data.ads.monetag_meta) document.getElementById('monetag-meta').content = data.ads.monetag_meta;
+                    if (data.ads.monetag_zone) {
+                        const sdk = document.getElementById('monetag-sdk');
+                        sdk.setAttribute('data-zone', data.ads.monetag_zone);
+                        sdk.setAttribute('data-sdk', 'show_' + data.ads.monetag_zone);
+                    }
+                    if (data.ads.adsterra_top) document.getElementById('ad-top-area').innerHTML = data.ads.adsterra_top;
+                    if (data.ads.adsterra_bottom) document.getElementById('ad-bottom-area').innerHTML = data.ads.adsterra_bottom;
+                    
+                    const scriptContainer = document.getElementById('monetag-scripts-area');
+                    scriptContainer.innerHTML = "";
+                    if (data.ads.monetag_push) { const s = document.createElement('script'); s.innerHTML = data.ads.monetag_push; scriptContainer.appendChild(s); }
+                    if (data.ads.monetag_vignette) { const s = document.createElement('script'); s.innerHTML = data.ads.monetag_vignette; scriptContainer.appendChild(s); }
+                    if (data.ads.monetag_inpage) { const s = document.createElement('script'); s.innerHTML = data.ads.monetag_inpage; scriptContainer.appendChild(s); }
+                }
+            });
+        }
+
+        function generateCaptcha() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let code = "";
+            for (let i = 0; i < 5; i++) { code += chars.charAt(Math.floor(Math.random() * chars.length)); }
+            currentCaptcha = code;
+            document.getElementById('captchaDisplay').innerText = code;
+        }
+
+        window.onload = () => {
+            generateCaptcha();
+            loadGlobalSettings();
+            document.getElementById("currentYear").textContent = new Date().getFullYear();
+        };
+
+        function verifyKey() {
+            const key = document.getElementById('userKey').value;
+            const userInputCaptcha = document.getElementById('captchaInput').value.toUpperCase();
+            if (userInputCaptcha !== currentCaptcha) {
+                Swal.fire({ icon: 'error', text: 'Captcha incorrect!', background: '#0f172a', color: '#fff' });
+                generateCaptcha();
+                return;
+            }
+            db.ref('links/' + key).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    targetFileLink = data.link;
+                    document.getElementById('innerFileName').innerText = data.name || "Link Identified";
+                    document.getElementById('urlStatusText').innerText = data.status || "Link is Active";
+                    switchStep('step1');
+                } else {
+                    Swal.fire({ icon: 'error', text: 'Invalid Key!', background: '#0f172a', color: '#fff' });
+                }
+            });
+        }
+
+        function switchStep(stepId) {
+            document.querySelectorAll('.step-box, #keySection').forEach(el => {
+                el.classList.remove('active-step'); el.style.display = 'none';
+            });
+            const current = document.getElementById(stepId);
+            current.style.display = 'block';
+            setTimeout(() => current.classList.add('active-step'), 10);
+            document.getElementById('roadmap').classList.remove('hidden');
+            document.getElementById('fileInfoArea').classList.remove('hidden');
+            updateRoadmap(parseInt(stepId.replace('step', '')) || 0);
+            adsCountPerStep = 0;
+        }
+
+        function updateRoadmap(step) {
+            document.querySelectorAll('.indicator-dot').forEach((dot, idx) => {
+                if(idx + 1 <= step) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        }
+
+        function callMonetagAd(step) {
+            const zone = currentAdSettings.monetag_zone || '10421542';
+            const funcName = 'show_' + zone;
+            if (typeof window[funcName] === 'function') {
+                window[funcName]().then(() => handleAdLogic(step)).catch(() => handleAdLogic(step));
+            } else { handleAdLogic(step); }
+        }
+
+        function handleAdLogic(step) {
+            adsCountPerStep++;
+            document.getElementById('count' + step).innerText = adsCountPerStep + "/2";
+            if(adsCountPerStep >= 2) {
+                if(step < 4) setTimeout(() => switchStep('step' + (step + 1)), 1000);
+                else {
+                    document.getElementById('adBtn4').classList.add('hidden');
+                    document.getElementById('finalActions').classList.remove('hidden');
+                }
+            }
+        }
+
+        function triggerDownload() { window.open(targetFileLink, '_blank'); }
+        function copyToClipboard() {
+            navigator.clipboard.writeText(targetFileLink);
+            Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'Copied!', showConfirmButton: false, timer: 1500 });
+        }
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('themeIcon');
+            if(document.body.classList.contains('light-mode')) icon.className = "fas fa-sun text-orange-500";
+            else icon.className = "fas fa-moon text-yellow-400";
+        }
+    </script>
+</body>
+</html>
