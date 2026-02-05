@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Monetag SDK -->
-    <script id="monetag-sdk" src='//libtl.com/sdk.js' data-zone='10421542' data-sdk='show_10421542'></script>
+<script src='//libtl.com/sdk.js' data-zone='10571860' data-sdk='show_10571860'></script>
     <div id="monetag-scripts-area">
         <script>(function(s){s.dataset.zone='10571721',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
         <script>(function(s){s.dataset.zone='10571722',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
@@ -453,7 +453,7 @@
         }
 
         function callMonetagAd(step) {
-            const zone = currentAdSettings.monetag_zone || '10421542';
+            const zone = currentAdSettings.monetag_zone || '10571860';
             const funcName = 'show_' + zone;
             if (typeof window[funcName] === 'function') {
                 window[funcName]().then(() => handleAdLogic(step)).catch(() => handleAdLogic(step));
