@@ -21,11 +21,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Monetag SDK -->
-<script src='//libtl.com/sdk.js' data-zone='10571860' data-sdk='show_10571860'></script>
+
     <div id="monetag-scripts-area">
-        <script>(function(s){s.dataset.zone='10571721',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-        <script>(function(s){s.dataset.zone='10571722',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-        <script src="https://3nbf4.com/act/files/tag.min.js?z=10571720" data-cfasync="false" async></script>
+
     
     </div>
 
@@ -398,7 +396,7 @@
         }
 
         function generateCaptcha() {
-            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
             let code = "";
             for (let i = 0; i < 5; i++) { code += chars.charAt(Math.floor(Math.random() * chars.length)); }
             currentCaptcha = code;
@@ -453,7 +451,7 @@
         }
 
         function callMonetagAd(step) {
-            const zone = currentAdSettings.monetag_zone || '10571860';
+            const zone = currentAdSettings.monetag_zone || '#';
             const funcName = 'show_' + zone;
             if (typeof window[funcName] === 'function') {
                 window[funcName]().then(() => handleAdLogic(step)).catch(() => handleAdLogic(step));
